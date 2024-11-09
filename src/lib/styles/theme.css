@@ -1,0 +1,40 @@
+:root {
+  /* Pastel Colors */
+  --pastel-pink: #ffd6e0;
+  --pastel-blue: #c1e3ff;
+  --pastel-green: #9cffc7;
+  --matcha-green: #008000;
+  --pastel-yellow: #fff4bd;
+  --pastel-purple: #e6c2ff;
+  
+  /* Background Colors */
+  --background-primary: #f8f9ff;
+  --background-card: #ffffff;
+  
+  /* Text Colors */
+  --text-primary: #5c6178;
+  --text-secondary: #8890a6;
+  
+  /* Shadows */
+  --shadow-soft: 0 8px 20px rgba(200, 206, 239, 0.3);
+  --shadow-hover: 0 12px 25px rgba(200, 206, 239, 0.5);
+  
+  /* Border Radius */
+  --radius-small: 12px;
+  --radius-medium: 20px;
+  --radius-large: 30px;
+}
+
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  font-family: 'Nunito', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Add some subtle animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+} 
