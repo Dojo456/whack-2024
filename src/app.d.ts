@@ -8,6 +8,11 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	interface ImportMetaEnv {
+		FIREBASE_PRIVATE_KEY: string;
+		FIREBASE_PROJECT_ID: string;
+		FIREBASE_CLIENT_EMAIL: string;
+	}
 }
 
 export {};

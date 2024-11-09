@@ -23,6 +23,9 @@
   --radius-small: 12px;
   --radius-medium: 20px;
   --radius-large: 30px;
+
+  /* Border */
+  --border-primary: 1px solid var(--text-primary);
 }
 
 body {
