@@ -1,9 +1,14 @@
+export type Goal = {
+	description: string;
+	amount: number;
+	progress: number;
+	animal: Animal;
+};
+
 export type Animal = {
 	name: string;
-	goalDescription: string;
-	goal: number;
-	progress: number;
-	completed: boolean;
+	id: string;
+	imageUrl: string;
 	stages: { [progressPercent: number]: AnimalStage };
 };
 
