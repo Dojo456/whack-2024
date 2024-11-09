@@ -7,7 +7,7 @@
 	let email = $state('');
 	let password = $state('');
 
-	const from = $page.url.searchParams.get('from') ?? '/';
+	const from = $page.url.searchParams.get('from') ?? '/current';
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();

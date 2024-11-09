@@ -3,7 +3,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, type User } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import type { Animal } from './models';
+import type { Animal, Goal } from './models';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -26,18 +26,40 @@ export type UserProfile = {
 	uid: string;
 	email: string;
 	displayName: string | null;
-	animals: Animal[];
+	goals: Goal[];
 };
 
 let currentUser = $state<UserProfile | null>(null);
 
 export const getCurrentUser = () => currentUser;
 
+const animals: { [id: string]: Animal } = {
+	'1': {
+		name: 'Blob',
+		id: '1',
+		imageUrl: '/images/blob.png',
+		stages: {}
+	}
+};
+
+export type GoalDocument = {
+	description: string;
+	amount: number;
+	progress: number;
+	animalId: string;
+};
+
 export const getUserProfile = async (firebaseUser: User): Promise<UserProfile> => {
 	const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
 	const data = userDoc.data();
 
-	const animals = data?.animals ?? [];
+	const goals =
+		data?.goals.map((goal: GoalDocument) => {
+			return {
+				...goal,
+				animal: animals[goal.animalId]
+			};
+		}) ?? [];
 
 	const email = firebaseUser.email;
 	if (!email) {
@@ -48,7 +70,7 @@ export const getUserProfile = async (firebaseUser: User): Promise<UserProfile> =
 		uid: firebaseUser.uid,
 		email: firebaseUser.email,
 		displayName: firebaseUser.displayName,
-		animals
+		goals
 	};
 };
 
