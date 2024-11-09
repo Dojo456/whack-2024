@@ -8,7 +8,7 @@
 
 <a href="/animal/{animal.id}" class="animal-card">
 	<div class="progress-card">
-		<h3>{animal.name}</h3>
+		<h3>{goal.description}</h3>
 		<div class="progress-bar-container">
 			<div class="progress-bar" style="width: {goal.progress}%">
 				<span class="progress-text">

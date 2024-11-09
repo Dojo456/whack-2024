@@ -1,9 +1,15 @@
 <script lang="ts">
 	import GoalCard from '$lib/components/GoalCard.svelte';
-	import { getCurrentUser } from '$lib/firebase.svelte';
 	import AddGoalModal from '$lib/components/AddGoalModal.svelte';
+	import { currentUser } from '$lib/firebase.svelte';
+	import type { Goal } from '$lib/models';
 
-	const goals = $derived(getCurrentUser()?.goals ?? []);
+	let goals = $state<Goal[]>([]);
+
+	currentUser.subscribe((user) => {
+		goals = user?.goals ?? [];
+	});
+
 	let isModalOpen = $state(false);
 </script>
 

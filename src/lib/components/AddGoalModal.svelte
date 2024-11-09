@@ -1,34 +1,26 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import type { Goal } from '$lib/models';
 	import { fade, scale } from 'svelte/transition';
-	import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
-	import { db, getCurrentUser } from '$lib/firebase.svelte';
+	import { addGoal } from '$lib/firebase.svelte';
 
 	const dispatch = createEventDispatcher();
 
-	let description = '';
-	let amount = 0;
-	let progress = 0;
+	let description = $state('');
+	let amount = $state(0);
+	let deadline = $state(new Date().toISOString().split('T')[0]);
+
+	let isLoading = $state(false);
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 
-		const currentUser = getCurrentUser();
-		if (!currentUser) {
-			console.error('No user logged in');
-			return;
-		}
-
 		try {
-			const userRef = doc(db, 'users', currentUser.uid);
-			await updateDoc(userRef, {
-				goals: arrayUnion({
-					description,
-					amount,
-					progress,
-					animalId: '1'
-				})
+			await addGoal({
+				description,
+				amount,
+				deadline: new Date(deadline),
+				progress: 0,
+				animalId: '1'
 			});
 
 			dispatch('close');
@@ -71,13 +63,15 @@
 			</div>
 
 			<div class="form-group">
-				<label for="progress">Initial Progress</label>
-				<input type="number" id="progress" bind:value={progress} min="0" max="100" required />
+				<label for="deadline">Deadline</label>
+				<input type="date" id="deadline" bind:value={deadline} required />
 			</div>
 
 			<div class="button-group">
 				<button type="button" class="cancel" onclick={() => dispatch('close')}>Cancel</button>
-				<button type="submit" class="submit">Add Goal</button>
+				<button type="submit" class="submit" disabled={isLoading}>
+					{isLoading ? 'Adding...' : 'Add Goal'}
+				</button>
 			</div>
 		</form>
 	</div>

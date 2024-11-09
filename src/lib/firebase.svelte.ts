@@ -2,8 +2,17 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAuth, type User } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import type { Animal, Goal } from './models';
+import {
+	arrayUnion,
+	doc,
+	getDoc,
+	getFirestore,
+	onSnapshot,
+	setDoc,
+	updateDoc
+} from 'firebase/firestore';
+import type { Animal, GoalDocument, UserProfile, UserProfileDocument } from './models';
+import { writable } from 'svelte/store';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,16 +31,7 @@ export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-export type UserProfile = {
-	uid: string;
-	email: string;
-	displayName: string | null;
-	goals: Goal[];
-};
-
-let currentUser = $state<UserProfile | null>(null);
-
-export const getCurrentUser = () => currentUser;
+export const currentUser = writable<UserProfile | null>(null);
 
 const animals: { [id: string]: Animal } = {
 	'1': {
@@ -42,17 +42,24 @@ const animals: { [id: string]: Animal } = {
 	}
 };
 
-export type GoalDocument = {
-	description: string;
-	amount: number;
-	progress: number;
-	animalId: string;
+const getUserProfile = async (firebaseUser: User) => {
+	const userRef = doc(db, 'users', firebaseUser.uid);
+	const userDoc = await getDoc(userRef);
+
+	if (!userDoc.exists()) {
+		await setDoc(userRef, {
+			uid: firebaseUser.uid,
+			email: firebaseUser.email,
+			displayName: firebaseUser.displayName,
+			goals: []
+		});
+	}
+
+	const data = userDoc.data();
+	setCurrentUser(data as UserProfileDocument);
 };
 
-export const getUserProfile = async (firebaseUser: User): Promise<UserProfile> => {
-	const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-	const data = userDoc.data();
-
+const setCurrentUser = (data: UserProfileDocument) => {
 	const goals =
 		data?.goals.map((goal: GoalDocument) => {
 			return {
@@ -61,23 +68,56 @@ export const getUserProfile = async (firebaseUser: User): Promise<UserProfile> =
 			};
 		}) ?? [];
 
-	const email = firebaseUser.email;
+	const email = data.email;
 	if (!email) {
 		throw new Error('User email is required');
 	}
 
-	return {
-		uid: firebaseUser.uid,
-		email: firebaseUser.email,
-		displayName: firebaseUser.displayName,
+	currentUser.set({
+		uid: data.uid,
+		email: data.email,
+		displayName: data.displayName,
 		goals
-	};
+	});
 };
 
-auth.onAuthStateChanged(async (user) => {
-	if (user) {
-		currentUser = await getUserProfile(user);
-	} else {
-		currentUser = null;
-	}
-});
+export const addGoal = async (goal: GoalDocument): Promise<void> => {
+	const result = new Promise<void>((resolve, reject) => {
+		const unsubscribe = currentUser.subscribe(async (user) => {
+			if (!user) {
+				reject(new Error('No user logged in'));
+				return;
+			}
+
+			const userRef = doc(db, 'users', user.uid);
+			await updateDoc(userRef, {
+				goals: arrayUnion({
+					...goal,
+					animalId: goal.animalId
+				})
+			});
+
+			resolve();
+			unsubscribe();
+		});
+	});
+
+	return result;
+};
+
+export const registerListeners = () => {
+	let unsubscribe: () => void;
+
+	auth.onAuthStateChanged(async (user) => {
+		if (user) {
+			await getUserProfile(user);
+
+			unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+				setCurrentUser(snapshot.data() as UserProfileDocument);
+			});
+		} else {
+			currentUser.set(null);
+			unsubscribe?.();
+		}
+	});
+};
