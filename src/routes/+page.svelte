@@ -1,97 +1,96 @@
 <script lang="ts">
-	import AnimalCard from '$lib/components/AnimalCard.svelte';
-	import '../lib/styles/theme.css';
-
-	const animals = [
-		{
-			name: 'Chicken',
-			stages: [
-				{ stage: 1, imageUrl: 'https://placekitten.com/300/300' },
-				{ stage: 2, imageUrl: 'https://placekitten.com/301/301' },
-				{ stage: 3, imageUrl: 'https://placekitten.com/302/302' }
-			]
-		},
-		{
-			name: 'Pig',
-			stages: [
-				{ stage: 1, imageUrl: 'https://placekitten.com/303/303' },
-				{ stage: 2, imageUrl: 'https://placekitten.com/304/304' }
-			]
-		},
-		{
-			name: 'Cow',
-			stages: [
-				{ stage: 1, imageUrl: 'https://placekitten.com/305/305' },
-				{ stage: 2, imageUrl: 'https://placekitten.com/306/306' },
-				{ stage: 3, imageUrl: 'https://placekitten.com/307/307' },
-				{ stage: 4, imageUrl: 'https://placekitten.com/308/308' }
-			]
-		}
-	];
+    import AnimalCard from '$lib/components/AnimalCard.svelte';
 </script>
 
-<main>
-	<h1>Growing Farm Friends</h1>
-	<p class="subtitle">Watch our adorable animals grow day by day!</p>
+<main class="container">
+    <header>
+        <h1>Whackathon 2024</h1>
+        <p class="subtitle">Discover and learn about different animals</p>
+    </header>
 
-	<div class="grid">
-		{#each animals as animal}
-			{#each animal.stages as { stage, imageUrl }}
-				<AnimalCard name={animal.name} {stage} {imageUrl} maxStage={animal.stages.length} />
-			{/each}
-		{/each}
-	</div>
+    <section class="features">
+        <div class="feature">
+            <h2>Browse Animals</h2>
+            <p>Explore our collection of animal cards featuring various species</p>
+        </div>
+        <div class="feature">
+            <h2>Learn Facts</h2>
+            <p>Each card contains interesting facts about the animals</p>
+        </div>
+        <div class="feature">
+            <h2>Interactive Experience</h2>
+            <p>Click on cards to learn more about each animal</p>
+        </div>
+    </section>
+
+    <section class="featured-cards">
+        <h2>Featured Animals</h2>
+        <div class="card-grid">
+            <!-- Add AnimalCard components here once you have the data -->
+        </div>
+    </section>
 </main>
 
 <style>
-	main {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
 
-	h1 {
-		text-align: center;
-		color: var(--text-primary);
-		font-size: 2.5rem;
-		margin: 2rem 0 0.5rem;
-		font-weight: 800;
-	}
+    header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
 
-	.subtitle {
-		text-align: center;
-		color: var(--text-secondary);
-		font-size: 1.1rem;
-		margin-bottom: 3rem;
-	}
+    h1 {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 3rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
 
-	.grid {
-		display: grid;
-		gap: 2rem;
-		grid-template-columns: 1fr;
-		animation: fadeIn 0.6s ease-out;
-	}
+    .subtitle {
+        font-size: 1.25rem;
+        color: #666;
+    }
 
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
 
-	@media (min-width: 768px) {
-		.grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
+    .feature {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-align: center;
+    }
 
-	@media (min-width: 1024px) {
-		.grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
+    .feature h2 {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .featured-cards {
+        margin-top: 2rem;
+    }
+
+    .featured-cards h2 {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
 </style>
