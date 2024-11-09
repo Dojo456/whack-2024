@@ -1,10 +1,12 @@
 <script lang="ts">
     let isMenuOpen = false;
+    
+    const toggleMenu = () => {
+        isMenuOpen = !isMenuOpen;
+    };
 
-    // Close menu when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
-        const target = event.target as HTMLElement;
-        const nav = target.closest('.nav-container');
+        const nav = (event.target as HTMLElement).closest('.nav-container');
         if (!nav) {
             isMenuOpen = false;
         }
@@ -14,18 +16,17 @@
 <svelte:window on:click={handleClickOutside} />
 
 <div class="nav-container">
-    <button 
-        class="blob-button" 
-        on:click={() => isMenuOpen = !isMenuOpen}
-        aria-label="Navigation menu"
-    >
-        <div class="blob-face">
-            <div class="eyes">
-                <div class="eye"></div>
-                <div class="eye"></div>
-            </div>
-            <div class="smile"></div>
-        </div>
+    <button class="blob-button" on:click={toggleMenu}>
+        <svg viewBox="0 0 50 50" class="blob-icon">
+            <circle cx="25" cy="25" r="23" fill="#9ed4a2" />
+            <!-- Eyes -->
+            <circle cx="18" cy="22" r="4" fill="white" />
+            <circle cx="32" cy="22" r="4" fill="white" />
+            <circle cx="18" cy="22" r="2" fill="black" />
+            <circle cx="32" cy="22" r="2" fill="black" />
+            <!-- Smile -->
+            <path d="M 15 28 Q 25 38 35 28" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" />
+        </svg>
     </button>
 
     {#if isMenuOpen}
@@ -47,92 +48,117 @@
     }
 
     .blob-button {
-        width: 60px;
-        height: 60px;
-        background: #9ed4a2;
+        background: none;
         border: none;
-        border-radius: 50%;
         cursor: pointer;
-        position: relative;
+        padding: 0;
         transition: transform 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .blob-icon {
+        width: 50px;
+        height: 50px;
     }
 
     .blob-button:hover {
         transform: scale(1.1);
     }
 
-    .blob-face {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .eyes {
-        position: absolute;
-        top: 35%;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 10px;
-    }
-
-    .eye {
-        width: 8px;
-        height: 8px;
-        background: #333;
-        border-radius: 50%;
-    }
-
-    .smile {
-        position: absolute;
-        bottom: 30%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 20px;
-        height: 10px;
-        border-bottom: 3px solid #333;
-        border-radius: 0 0 10px 10px;
-    }
-
     .menu {
         position: absolute;
-        top: 70px;
+        top: 60px;
         left: 0;
-        background: white;
-        border-radius: 15px;
-        padding: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+        padding: 1rem;
+        border-radius: 20px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        gap: 5px;
-        animation: slideDown 0.3s ease;
+        gap: 0.5rem;
+        min-width: 150px;
+        animation: popIn 0.3s ease-out;
     }
 
     .menu-item {
-        text-decoration: none;
-        color: #5c6178;
-        padding: 10px 20px;
-        border-radius: 10px;
         font-family: 'Nunito', sans-serif;
+        color: #7fb883;
+        text-decoration: none;
+        padding: 0.8rem 1.2rem;
+        border-radius: 15px;
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
         font-weight: 600;
-        transition: background 0.2s ease;
-        white-space: nowrap;
+        text-align: center;
     }
 
     .menu-item:hover {
-        background: #f0f9f0;
-        color: #9ed4a2;
+        background: #e8f5e9;
+        transform: scale(1.05);
     }
 
-    @keyframes slideDown {
-        from {
+    @keyframes popIn {
+        0% {
             opacity: 0;
             transform: translateY(-10px);
         }
-        to {
+        100% {
             opacity: 1;
             transform: translateY(0);
+        }
+    }
+
+    .blob-button {
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    /* Responsive design for mobile */
+    @media (max-width: 768px) {
+        .nav-container {
+            top: 15px;
+            left: 15px;
+        }
+
+        .blob-icon {
+            width: 35px;  /* Smaller size for mobile */
+            height: 35px;
+        }
+
+        .menu {
+            top: 45px;  /* Adjusted to match smaller icon */
+            min-width: 130px;
+        }
+
+        .menu-item {
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+        }
+    }
+
+    /* Even smaller for very small screens */
+    @media (max-width: 360px) {
+        .blob-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .menu {
+            top: 40px;
+            min-width: 120px;
+        }
+
+        .menu-item {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.9rem;
         }
     }
 </style> 
