@@ -3,15 +3,27 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, type User } from 'firebase/auth';
 import {
-	arrayUnion,
 	doc,
 	getDoc,
 	getFirestore,
 	onSnapshot,
 	setDoc,
-	updateDoc
+	collection,
+	arrayUnion,
+	updateDoc,
+	getDocs,
+	where,
+	query,
+	documentId
 } from 'firebase/firestore';
-import type { Animal, GoalDocument, UserProfile, UserProfileDocument } from './models';
+import type {
+	Animal,
+	GoalDocument,
+	UserProfileDocument,
+	UserProfile,
+	Goal,
+	GoalDocumentWithID
+} from './models';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -30,8 +42,9 @@ export const app = $state(initializeApp(firebaseConfig));
 export const db = $state(getFirestore(app));
 export const auth = $state(getAuth(app));
 
-export const appState = $state<{ currentUser: UserProfile | null }>({
-	currentUser: null
+export const appState = $state<{ currentUser: UserProfile | null; goals: Goal[] }>({
+	currentUser: null,
+	goals: []
 });
 
 const animals: { [id: string]: Animal } = {
@@ -43,7 +56,7 @@ const animals: { [id: string]: Animal } = {
 	}
 };
 
-const getUserProfile = async (firebaseUser: User) => {
+const syncUserProfile = async (firebaseUser: User) => {
 	const userRef = doc(db, 'users', firebaseUser.uid);
 	const userDoc = await getDoc(userRef);
 
@@ -60,26 +73,60 @@ const getUserProfile = async (firebaseUser: User) => {
 	setCurrentUser(data as UserProfileDocument);
 };
 
-const setCurrentUser = (data: UserProfileDocument) => {
-	const goals =
-		data?.goals.map((goal: GoalDocument) => {
-			return {
-				...goal,
-				animal: animals[goal.animalId]
-			};
-		}) ?? [];
+const syncUserGoals = async (data?: UserProfileDocument): Promise<void> => {
+	const goalsIDs = data?.goals ?? appState.currentUser?.goals ?? [];
 
+	if (goalsIDs.length === 0) {
+		setGoals([]);
+		return;
+	}
+
+	const goalsCollection = collection(db, 'goals');
+
+	const goalDocsNoID = await getDocs(
+		query(
+			goalsCollection,
+			where(
+				documentId(),
+				'in',
+				goalsIDs.map((id) => id.toString())
+			)
+		)
+	);
+
+	const goalDocs: GoalDocumentWithID[] = goalDocsNoID.docs.map((doc) => {
+		const goal = doc.data() as GoalDocumentWithID;
+		goal.id = doc.id;
+
+		return goal;
+	});
+
+	setGoals(goalDocs);
+};
+
+const setCurrentUser = (data: UserProfileDocument) => {
 	const email = data.email;
 	if (!email) {
 		throw new Error('User email is required');
 	}
 
-	appState.currentUser = {
-		uid: data.uid,
-		email: data.email,
-		displayName: data.displayName,
-		goals
-	};
+	appState.currentUser = data;
+};
+
+const setGoals = (goals: GoalDocumentWithID[]) => {
+	appState.goals = goals.map((goalDoc) => {
+		const animal = animals[goalDoc.animalId];
+		const goal: Goal = {
+			id: goalDoc.id,
+			animal,
+			description: goalDoc.description,
+			progress: goalDoc.progress,
+			amount: goalDoc.amount,
+			deadline: goalDoc.deadline
+		};
+
+		return goal;
+	});
 };
 
 export const addGoal = async (goal: GoalDocument): Promise<void> => {
@@ -87,12 +134,18 @@ export const addGoal = async (goal: GoalDocument): Promise<void> => {
 		throw new Error('No user logged in');
 	}
 
-	const userRef = doc(db, 'users', appState.currentUser.uid);
-	return await updateDoc(userRef, {
-		goals: arrayUnion({
-			...goal,
-			animalId: goal.animalId
-		})
+	const goalsCollection = collection(db, 'goals');
+
+	const goalRef = doc(goalsCollection);
+	await setDoc(goalRef, {
+		...goal,
+		animalId: goal.animalId
+	});
+
+	const docID = goalRef.id;
+
+	await updateDoc(doc(db, 'users', appState.currentUser.uid), {
+		goals: arrayUnion(docID)
 	});
 };
 
@@ -101,10 +154,19 @@ export const registerListeners = () => {
 
 	unsubscribe = auth.onAuthStateChanged(async (user) => {
 		if (user) {
-			await getUserProfile(user);
+			await syncUserProfile(user);
+			await syncUserGoals();
 
 			unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
-				setCurrentUser(snapshot.data() as UserProfileDocument);
+				const data = snapshot.data();
+				if (!data) {
+					return;
+				}
+
+				const user = data as UserProfileDocument;
+
+				setCurrentUser(user);
+				syncUserGoals(user);
 			});
 		} else {
 			appState.currentUser = null;

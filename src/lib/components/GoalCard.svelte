@@ -6,7 +6,7 @@
 	const animal = goal.animal;
 </script>
 
-<a href="/animal/{animal.id}" class="animal-card">
+<a href="/goal/{animal.id}" class="goal-card">
 	<div class="progress-card">
 		<h3>{goal.description}</h3>
 		<div class="progress-bar-container">
@@ -20,7 +20,7 @@
 </a>
 
 <style>
-	.animal-card {
+	.goal-card {
 		display: block;
 		text-decoration: none;
 		background: var(--background-card);
@@ -31,7 +31,7 @@
 		animation: float 6s ease-in-out infinite;
 	}
 
-	.animal-card:hover {
+	.goal-card:hover {
 		transform: translateY(-8px);
 		box-shadow: var(--shadow-hover);
 	}

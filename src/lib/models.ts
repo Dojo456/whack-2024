@@ -2,17 +2,18 @@ export type UserProfile = {
 	uid: string;
 	email: string;
 	displayName: string | null;
-	goals: Goal[];
+	goals: string[];
 };
 
 export type UserProfileDocument = {
 	uid: string;
 	email: string;
 	displayName: string | null;
-	goals: GoalDocument[];
+	goals: string[];
 };
 
 export type Goal = {
+	id: string;
 	description: string;
 	amount: number;
 	progress: number;
@@ -26,6 +27,10 @@ export type GoalDocument = {
 	progress: number;
 	deadline: Date;
 	animalId: string;
+};
+
+export type GoalDocumentWithID = GoalDocument & {
+	id: string;
 };
 
 export type Animal = {

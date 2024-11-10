@@ -4,7 +4,9 @@
 	import { appState } from '$lib/firebase.svelte';
 	import type { Goal } from '$lib/models';
 
-	let goals = $derived<Goal[]>(appState.currentUser?.goals ?? []);
+	let goals = $derived<Goal[]>(appState.goals ?? []);
+
+	$inspect(goals);
 
 	let isModalOpen = $state(false);
 </script>
