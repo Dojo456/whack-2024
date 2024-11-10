@@ -2,10 +2,16 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { auth } from '$lib/firebase.svelte';
+	import type { FirebaseError } from 'firebase/app';
 	import { signInWithEmailAndPassword } from 'firebase/auth';
 
 	let email = $state('');
 	let password = $state('');
+
+	let loading = $state(false);
+	let error = $state<string | null>(null);
+
+	$inspect(error);
 
 	const from = $page.url.searchParams.get('from') ?? '/current';
 
@@ -13,11 +19,14 @@
 		event.preventDefault();
 
 		try {
+			loading = true;
 			await signInWithEmailAndPassword(auth, email, password);
 
 			goto(from);
-		} catch (error) {
-			console.error('Login failed:', error);
+		} catch (reason) {
+			error = (reason as FirebaseError).message;
+		} finally {
+			loading = false;
 		}
 	}
 </script>
@@ -36,7 +45,11 @@
 				<input type="password" id="password" bind:value={password} required />
 			</div>
 
-			<button type="submit">Log In</button>
+			<button type="submit" disabled={loading}>
+				{loading ? 'Loading...' : 'Log In'}
+			</button>
+
+			<p class="error">{error}</p>
 		</form>
 	</div>
 </main>
@@ -68,6 +81,11 @@
 
 	.form-group {
 		margin-bottom: 1.5rem;
+	}
+
+	.error {
+		color: red;
+		font-weight: 600;
 	}
 
 	label {

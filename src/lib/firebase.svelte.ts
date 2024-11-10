@@ -12,7 +12,6 @@ import {
 	updateDoc
 } from 'firebase/firestore';
 import type { Animal, GoalDocument, UserProfile, UserProfileDocument } from './models';
-import { writable } from 'svelte/store';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -27,11 +26,13 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+export const app = $state(initializeApp(firebaseConfig));
+export const db = $state(getFirestore(app));
+export const auth = $state(getAuth(app));
 
-export const currentUser = writable<UserProfile | null>(null);
+export const appState = $state<{ currentUser: UserProfile | null }>({
+	currentUser: null
+});
 
 const animals: { [id: string]: Animal } = {
 	'1': {
@@ -73,42 +74,32 @@ const setCurrentUser = (data: UserProfileDocument) => {
 		throw new Error('User email is required');
 	}
 
-	currentUser.set({
+	appState.currentUser = {
 		uid: data.uid,
 		email: data.email,
 		displayName: data.displayName,
 		goals
-	});
+	};
 };
 
 export const addGoal = async (goal: GoalDocument): Promise<void> => {
-	const result = new Promise<void>((resolve, reject) => {
-		const unsubscribe = currentUser.subscribe(async (user) => {
-			if (!user) {
-				reject(new Error('No user logged in'));
-				return;
-			}
+	if (!appState.currentUser) {
+		throw new Error('No user logged in');
+	}
 
-			const userRef = doc(db, 'users', user.uid);
-			await updateDoc(userRef, {
-				goals: arrayUnion({
-					...goal,
-					animalId: goal.animalId
-				})
-			});
-
-			resolve();
-			unsubscribe();
-		});
+	const userRef = doc(db, 'users', appState.currentUser.uid);
+	return await updateDoc(userRef, {
+		goals: arrayUnion({
+			...goal,
+			animalId: goal.animalId
+		})
 	});
-
-	return result;
 };
 
 export const registerListeners = () => {
 	let unsubscribe: () => void;
 
-	auth.onAuthStateChanged(async (user) => {
+	unsubscribe = auth.onAuthStateChanged(async (user) => {
 		if (user) {
 			await getUserProfile(user);
 
@@ -116,8 +107,10 @@ export const registerListeners = () => {
 				setCurrentUser(snapshot.data() as UserProfileDocument);
 			});
 		} else {
-			currentUser.set(null);
+			appState.currentUser = null;
 			unsubscribe?.();
 		}
 	});
+
+	return unsubscribe;
 };

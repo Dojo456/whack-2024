@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		registerListeners();
+		return registerListeners();
 	});
 </script>
 

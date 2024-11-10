@@ -1,9 +1,9 @@
 <script lang="ts">
 	import GoalCard from '$lib/components/GoalCard.svelte';
-	import { getCurrentUser } from '$lib/firebase.svelte';
+	import { appState } from '$lib/firebase.svelte';
 	import '../../lib/styles/theme.css';
 
-	const completedGoals = $derived(getCurrentUser()?.goals ?? []);
+	const completedGoals = $derived(appState.currentUser?.goals ?? []);
 </script>
 
 <main>
