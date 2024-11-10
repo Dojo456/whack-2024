@@ -3,6 +3,7 @@
 	import AddGoalModal from '$lib/components/AddGoalModal.svelte';
 	import { appState } from '$lib/firebase.svelte';
 	import type { Goal } from '$lib/models';
+	import { send, receive } from '$lib/transition.svelte';
 
 	let goals = $derived<Goal[]>(appState.goals ?? []);
 
@@ -11,30 +12,27 @@
 	let isModalOpen = $state(false);
 </script>
 
-<div class="background">
-	<div class="page-container">
-		<h1 class="main-heading">Current Blobs</h1>
-		<div class="progress-container">
-			<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Blob</button>
-			{#each goals as goal}
+<main class="page-container">
+	<div class="progress-container">
+		{#each goals as goal}
+			<div in:receive={{ key: 'goal' }} out:send={{ key: 'goal' }}>
 				<GoalCard {goal} />
-			{/each}
-		</div>
+			</div>
+		{/each}
+
+		{#if goals.length < 3}
+			<div class="add-button-container">
+				<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Goal</button>
+			</div>
+		{/if}
 	</div>
-</div>
+</main>
 
 {#if isModalOpen}
-	<AddGoalModal on:close={() => (isModalOpen = false)} />
+	<AddGoalModal close={() => (isModalOpen = false)} />
 {/if}
 
 <style>
-	.background {
-		background-color: #e8f5e9;
-		min-height: 100vh;
-		position: relative;
-		overflow: hidden;
-	}
-
 	@keyframes float {
 		0%,
 		100% {
@@ -57,15 +55,6 @@
 		padding: 2rem 1rem;
 	}
 
-	.main-heading {
-		text-align: center;
-		color: #7fb883;
-		font-size: 3.5rem;
-		margin-bottom: 2.5rem;
-		font-weight: 700;
-		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
 	.progress-container {
 		display: flex;
 		flex-direction: column;
@@ -76,14 +65,14 @@
 		max-width: 600px;
 	}
 
+	.add-button-container {
+		display: flex;
+		justify-content: center;
+	}
+
 	@media (max-width: 600px) {
 		.page-container {
 			margin: 1rem auto;
-		}
-
-		.main-heading {
-			font-size: 2.5rem;
-			margin-bottom: 2rem;
 		}
 
 		.progress-container {
@@ -102,7 +91,6 @@
 		cursor: pointer;
 		transition: background-color 0.2s;
 		align-self: center;
-		margin-bottom: 1rem;
 	}
 
 	.add-button:hover {

@@ -47,12 +47,33 @@ export const appState = $state<{ currentUser: UserProfile | null; goals: Goal[] 
 	goals: []
 });
 
+import image0 from '$lib/assets/image0.jpg';
+import image1 from '$lib/assets/image1.jpg';
+import image2 from '$lib/assets/image2.jpg';
+import image3 from '$lib/assets/image3.jpg';
+
 const animals: { [id: string]: Animal } = {
 	'1': {
-		name: 'Blob',
+		name: 'Tree',
 		id: '1',
-		imageUrl: '/images/blob.png',
-		stages: {}
+		stages: {
+			0.25: {
+				imageUrl: image0,
+				description: 'Blob'
+			},
+			0.5: {
+				imageUrl: image1,
+				description: 'Blob'
+			},
+			0.75: {
+				imageUrl: image2,
+				description: 'Blob'
+			},
+			1: {
+				imageUrl: image3,
+				description: 'Blob'
+			}
+		}
 	}
 };
 
@@ -122,7 +143,7 @@ const setGoals = (goals: GoalDocumentWithID[]) => {
 			description: goalDoc.description,
 			progress: goalDoc.progress,
 			amount: goalDoc.amount,
-			deadline: goalDoc.deadline
+			deadline: goalDoc.deadline.toDate()
 		};
 
 		return goal;

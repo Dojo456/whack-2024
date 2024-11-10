@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type UserProfile = {
 	uid: string;
 	email: string;
@@ -25,7 +27,7 @@ export type GoalDocument = {
 	description: string;
 	amount: number;
 	progress: number;
-	deadline: Date;
+	deadline: Timestamp;
 	animalId: string;
 };
 
@@ -36,7 +38,6 @@ export type GoalDocumentWithID = GoalDocument & {
 export type Animal = {
 	name: string;
 	id: string;
-	imageUrl: string;
 	stages: { [progressPercent: number]: AnimalStage };
 };
 

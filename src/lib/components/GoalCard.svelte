@@ -1,25 +1,39 @@
 <script lang="ts">
 	import type { Goal } from '$lib/models';
+	import { getGoalImage } from '$lib/utils';
 
 	const { goal }: { goal: Goal } = $props();
-
-	const animal = goal.animal;
+	const imageUrl = $derived<string | undefined>(goal ? getGoalImage(goal) : undefined);
 </script>
 
-<a href="/goal/{animal.id}" class="goal-card">
-	<div class="progress-card">
-		<h3>{goal.description}</h3>
-		<div class="progress-bar-container">
-			<div class="progress-bar" style="width: {goal.progress}%">
-				<span class="progress-text">
-					{goal.progress}%
-				</span>
+<a data-sveltekit-preload-data="hover" href="/goal/{goal.id}" class="goal-card">
+	<div class="goal-card-content">
+		<img src={imageUrl} alt={goal.animal.name} />
+		<div class="progress-card">
+			<h3>{goal.description}</h3>
+			<div class="progress-bar-container">
+				<div class="progress-bar" style="width: {goal.progress}%"></div>
 			</div>
+			<span class="progress-text">
+				${goal.progress} out of ${goal.amount}
+			</span>
 		</div>
 	</div>
 </a>
 
 <style>
+	.goal-card-content {
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+	}
+
+	.goal-card-content img {
+		width: 100px;
+		height: 100px;
+		object-fit: cover;
+	}
+
 	.goal-card {
 		display: block;
 		text-decoration: none;
@@ -44,8 +58,12 @@
 	}
 
 	.progress-card {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 		background-color: rgba(255, 255, 255, 0.9);
-		padding: 1.5rem;
+		flex-grow: 1;
+		padding: 0.5rem;
 		border-radius: 25px;
 		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 		transition: transform 0.2s ease;
@@ -58,7 +76,7 @@
 
 	h3 {
 		color: #7fb883;
-		margin-bottom: 1rem;
+		margin-bottom: 0;
 		font-size: 1.5rem;
 		font-weight: 600;
 	}
@@ -66,7 +84,7 @@
 	.progress-bar-container {
 		background-color: #f0f9f0;
 		border-radius: 30px;
-		height: 35px;
+		height: 15px;
 		overflow: hidden;
 		position: relative;
 	}
@@ -82,7 +100,7 @@
 	}
 
 	.progress-text {
-		color: #ffffff;
+		color: var(--text-primary);
 		font-size: 1.2rem;
 		font-weight: 600;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);

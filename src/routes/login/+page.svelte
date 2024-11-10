@@ -13,7 +13,7 @@
 
 	$inspect(error);
 
-	const from = $page.url.searchParams.get('from') ?? '/current';
+	const from = $page.url.searchParams.get('from') ?? '/goal';
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();

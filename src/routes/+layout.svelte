@@ -8,8 +8,10 @@
 	onMount(() => {
 		return registerListeners();
 	});
+
+	const { children } = $props();
 </script>
 
 <BlobNav />
 
-<slot />
+{@render children()}

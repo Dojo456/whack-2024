@@ -1,13 +1,24 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { addGoal } from '$lib/firebase.svelte';
+	import { onMount } from 'svelte';
+	import { Timestamp } from 'firebase/firestore';
 
-	const dispatch = createEventDispatcher();
+	const { close } = $props<{ close: () => void }>();
 
 	let description = $state('');
-	let amount = $state(0);
+	let amount = $state(1);
 	let deadline = $state(new Date().toISOString().split('T')[0]);
+
+	onMount(() => {
+		const unsubscribe = document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				close();
+			}
+		});
+
+		return unsubscribe;
+	});
 
 	let isLoading = $state(false);
 
@@ -18,12 +29,12 @@
 			await addGoal({
 				description,
 				amount,
-				deadline: new Date(deadline),
+				deadline: Timestamp.fromDate(new Date(deadline)),
 				progress: 0,
 				animalId: '1'
 			});
 
-			dispatch('close');
+			close();
 		} catch (error) {
 			console.error('Error adding goal:', error);
 		}
@@ -31,14 +42,10 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="modal-backdrop"
-	onclick={() => dispatch('close')}
-	onkeydown={(event) => {
-		if (event.key === 'Escape') {
-			dispatch('close');
-		}
-	}}
+	onclick={() => close()}
 	role="dialog"
 	transition:fade={{ duration: 200 }}
 >
@@ -59,7 +66,7 @@
 
 			<div class="form-group">
 				<label for="amount">Target Amount</label>
-				<input type="number" id="amount" bind:value={amount} min="0" required />
+				<input type="number" id="amount" bind:value={amount} min="1" required />
 			</div>
 
 			<div class="form-group">
@@ -68,7 +75,7 @@
 			</div>
 
 			<div class="button-group">
-				<button type="button" class="cancel" onclick={() => dispatch('close')}>Cancel</button>
+				<button type="button" class="cancel" onclick={close}>Cancel</button>
 				<button type="submit" class="submit" disabled={isLoading}>
 					{isLoading ? 'Adding...' : 'Add Goal'}
 				</button>
