@@ -42,9 +42,9 @@ export const app = $state(initializeApp(firebaseConfig));
 export const db = $state(getFirestore(app));
 export const auth = $state(getAuth(app));
 
-export const appState = $state<{ currentUser: UserProfile | null; goals: Goal[] }>({
+export const appState = $state<{ currentUser: UserProfile | null; goals: Goal[] | null }>({
 	currentUser: null,
-	goals: []
+	goals: null
 });
 
 import image0 from '$lib/assets/image0.png';
@@ -61,15 +61,15 @@ const animals: { [id: string]: Animal } = {
 				imageUrl: image0,
 				description: 'Blob'
 			},
-			0.33: {
+			0.25: {
 				imageUrl: image1,
 				description: 'Blob'
 			},
-			0.66: {
+			0.5: {
 				imageUrl: image2,
 				description: 'Blob'
 			},
-			1: {
+			0.75: {
 				imageUrl: image3,
 				description: 'Blob'
 			}
@@ -115,12 +115,14 @@ const syncUserGoals = async (data?: UserProfileDocument): Promise<void> => {
 		)
 	);
 
-	const goalDocs: GoalDocumentWithID[] = goalDocsNoID.docs.map((doc) => {
-		const goal = doc.data() as GoalDocumentWithID;
-		goal.id = doc.id;
+	const goalDocs: GoalDocumentWithID[] = goalDocsNoID.docs
+		.map((doc) => {
+			const goal = doc.data() as GoalDocumentWithID;
+			goal.id = doc.id;
 
-		return goal;
-	});
+			return goal;
+		})
+		.filter((goal) => goal.progress < goal.amount);
 
 	setGoals(goalDocs);
 };

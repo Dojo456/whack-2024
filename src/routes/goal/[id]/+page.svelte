@@ -17,10 +17,16 @@
 	});
 
 	const goalId = $page.params.id;
-	const goals = $derived<Goal[]>(appState.goals);
-	const goal = $derived<Goal | undefined>(goals.find((g) => g.id === goalId));
+	const goals = $derived<Goal[] | null>(appState.goals);
+	const goal = $derived<Goal | undefined>(goals ? goals.find((g) => g.id === goalId) : undefined);
 
 	const imageUrl = $derived<string | undefined>(goal ? getGoalImage(goal) : undefined);
+
+	$effect(() => {
+		if (!goal || goal.progress >= goal.amount) {
+			goto('/goal');
+		}
+	});
 
 	async function handleDeposit(amount: number) {
 		if (!goal) return;
@@ -99,11 +105,13 @@
 		</div>
 	</div>
 
-	<GoalImages {goals} focused={goal.id} />
-{:else if goal === null}
-	<div class="error-message">Goal not found</div>
-{:else}
-	<div class="error-message">Loading goal...</div>
+	{#if goals}
+		<GoalImages {goals} focused={goal.id} />
+	{:else if goal === null}
+		<div class="error-message">Loading goal...</div>
+	{:else}
+		<div class="error-message">Goal not found</div>
+	{/if}
 {/if}
 
 <style>

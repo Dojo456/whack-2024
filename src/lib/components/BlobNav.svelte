@@ -141,11 +141,6 @@
 			right: 15px;
 		}
 
-		.blob-icon {
-			width: 35px;
-			height: 35px;
-		}
-
 		.menu {
 			bottom: 45px;
 			min-width: 130px;

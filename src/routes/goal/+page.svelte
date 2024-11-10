@@ -6,26 +6,32 @@
 	import { send, receive } from '$lib/transition.svelte';
 	import GoalImages from '$lib/components/GoalImages.svelte';
 
-	let goals = $derived<Goal[]>(appState.goals ?? []);
+	let goals = $derived<Goal[] | null>(appState.goals);
 
 	let isModalOpen = $state(false);
 </script>
 
-<div class="progress-container">
-	{#each goals as goal}
-		<div in:receive={{ key: 'goal' }} out:send={{ key: 'goal' }}>
-			<GoalCard {goal} />
-		</div>
-	{/each}
+{#if goals}
+	<div class="progress-container">
+		{#each goals as goal}
+			<div in:receive={{ key: 'goal' }} out:send={{ key: 'goal' }}>
+				<GoalCard {goal} />
+			</div>
+		{/each}
 
-	{#if goals.length < 3}
-		<div class="add-button-container">
-			<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Goal</button>
-		</div>
-	{/if}
-</div>
+		{#if goals.length < 3}
+			<div class="add-button-container">
+				<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Goal</button>
+			</div>
+		{/if}
+	</div>
 
-<GoalImages {goals} />
+	<GoalImages {goals} />
+{:else if goals === null}
+	<div class="error-message">Loading goals...</div>
+{:else}
+	<div class="error-message">No goals found</div>
+{/if}
 
 {#if isModalOpen}
 	<AddGoalModal close={() => (isModalOpen = false)} />
