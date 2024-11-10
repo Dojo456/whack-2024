@@ -150,6 +150,12 @@ const setGoals = (goals: GoalDocumentWithID[]) => {
 	});
 };
 
+export const updateGoal = async (goalId: string, goal: Partial<GoalDocument>): Promise<void> => {
+	const goalRef = doc(db, 'goals', goalId);
+	await updateDoc(goalRef, goal);
+	await syncUserGoals();
+};
+
 export const addGoal = async (goal: GoalDocument): Promise<void> => {
 	if (!appState.currentUser) {
 		throw new Error('No user logged in');

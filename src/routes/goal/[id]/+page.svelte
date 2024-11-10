@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { appState } from '$lib/firebase.svelte';
+	import { appState, updateGoal } from '$lib/firebase.svelte';
 	import type { Goal } from '$lib/models';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
@@ -21,61 +21,90 @@
 	const goal = $derived<Goal | undefined>(goals.find((g) => g.id === goalId));
 
 	const imageUrl = $derived<string | undefined>(goal ? getGoalImage(goal) : undefined);
+
+	async function handleDeposit(amount: number) {
+		if (!goal) return;
+
+		const newProgress = Math.min(goal.progress + amount, goal.amount);
+		await updateGoal(goal.id, { progress: newProgress });
+	}
+
+	async function handleCustomDeposit() {
+		if (!goal) return;
+
+		const amount = prompt('Enter deposit amount:');
+		if (!amount) return;
+
+		const depositAmount = parseFloat(amount);
+		if (isNaN(depositAmount) || depositAmount <= 0) {
+			alert('Please enter a valid amount');
+			return;
+		}
+
+		await handleDeposit(depositAmount);
+	}
 </script>
 
-<main class="page-container">
-	<a
-		data-sveltekit-preload-data="hover"
-		href="/goal"
-		class="page-back-link"
-		aria-label="Back to goals"
+<a
+	data-sveltekit-preload-data="hover"
+	href="/goal"
+	class="page-back-link"
+	aria-label="Back to goals"
+>
+</a>
+
+{#if goal}
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="goal-detail-card"
+		onclick={(event) => {
+			event.stopPropagation();
+		}}
+		in:receive={{ key: 'goal' }}
+		out:send={{ key: 'goal' }}
 	>
-	</a>
+		<button class="back-button" onclick={() => goto('/goal')} aria-label="Back to goals">
+			← All Goals
+		</button>
+		<div class="header">
+			<img src={imageUrl} alt={goal.animal.name} />
+			<h1>{goal.description}</h1>
+		</div>
 
-	{#if goal}
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			class="goal-detail-card"
-			onclick={(event) => {
-				event.stopPropagation();
-			}}
-			in:receive={{ key: 'goal' }}
-			out:send={{ key: 'goal' }}
-		>
-			<button class="back-button" onclick={() => goto('/goal')} aria-label="Back to goals">
-				← All Goals
-			</button>
-			<div class="header">
-				<img src={imageUrl} alt={goal.animal.name} width={100} height={100} />
-				<h1>{goal.description}</h1>
+		<div class="progress-section">
+			<div class="progress-bar-container">
+				<div class="progress-bar" style="width: {(goal.progress / goal.amount) * 100}%"></div>
 			</div>
+			<span class="progress-text">
+				${goal.progress} out of ${goal.amount}
+			</span>
 
-			<div class="progress-section">
-				<div class="progress-bar-container">
-					<div class="progress-bar" style="width: {goal.progress}%"></div>
-				</div>
-				<span class="progress-text">
-					${goal.progress} out of ${goal.amount}
-				</span>
-			</div>
-
-			<div class="details-section">
-				<div class="detail-item">
-					<h3>Deadline</h3>
-					<p>{new Date(goal.deadline).toLocaleDateString()}</p>
-				</div>
+			<div class="deposit-buttons">
+				<button class="deposit-btn" onclick={() => handleDeposit(5)}>+$5</button>
+				<button class="deposit-btn" onclick={() => handleDeposit(10)}>+$10</button>
+				<button class="deposit-btn" onclick={() => handleDeposit(20)}>+$20</button>
+				<button class="deposit-btn custom" onclick={() => handleCustomDeposit()}
+					>Custom Amount</button
+				>
 			</div>
 		</div>
 
-		<GoalImages {goals} focused={goal} />
-	{:else if goal === null}
-		<div class="error-message">Goal not found</div>
-	{:else}
-		<div class="error-message">Loading goal...</div>
-	{/if}
-</main>
+		<div class="details-section">
+			<div class="detail-item">
+				<h3>Deadline</h3>
+				<p>{new Date(goal.deadline).toLocaleDateString()}</p>
+			</div>
+		</div>
+	</div>
+
+	<GoalImages {goals} focused={goal.id} />
+{:else if goal === null}
+	<div class="error-message">Goal not found</div>
+{:else}
+	<div class="error-message">Loading goal...</div>
+{/if}
 
 <style>
 	.page-back-link {
@@ -89,17 +118,6 @@
 		z-index: -1;
 	}
 
-	.page-container {
-		z-index: 1;
-		max-width: 800px;
-		margin: 1rem;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-	}
-
 	.goal-detail-card {
 		background: var(--background-card);
 		border-radius: var(--radius-medium);
@@ -111,6 +129,7 @@
 	.header {
 		display: flex;
 		align-items: center;
+		margin-top: 1.5rem;
 		gap: 2rem;
 		margin-bottom: 2rem;
 	}
@@ -120,6 +139,7 @@
 		height: 150px;
 		object-fit: cover;
 		border-radius: var(--radius-medium);
+		background: lightgray;
 	}
 
 	h1 {
@@ -223,5 +243,35 @@
 
 	.back-button:hover {
 		transform: scale(1.1);
+	}
+
+	.deposit-buttons {
+		display: flex;
+		gap: 1rem;
+		margin-top: 1rem;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.deposit-btn {
+		background: var(--background-card);
+		border: 2px solid #9ed4a2;
+		border-radius: var(--radius-small);
+		padding: 0.5rem 1rem;
+		font-size: 1.1rem;
+		cursor: pointer;
+		color: var(--text-primary);
+		transition: all 0.2s;
+	}
+
+	.deposit-btn:active {
+		background: #9ed4a2;
+		color: white;
+		transform: translateY(-2px);
+	}
+
+	.deposit-btn.custom {
+		background: transparent;
+		border: 2px dashed #9ed4a2;
 	}
 </style>

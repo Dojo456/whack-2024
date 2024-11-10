@@ -1,5 +1,8 @@
 <script lang="ts">
-	let isMenuOpen = false;
+	import { auth } from '$lib/firebase.svelte';
+	import { goto } from '$app/navigation';
+
+	let isMenuOpen = $state(false);
 
 	const toggleMenu = () => {
 		isMenuOpen = !isMenuOpen;
@@ -11,36 +14,26 @@
 			isMenuOpen = false;
 		}
 	};
+
+	async function handleSignOut() {
+		try {
+			await auth.signOut();
+			goto('/login');
+		} catch (error) {
+			console.error('Error signing out:', error);
+		}
+	}
 </script>
 
 <svelte:window on:click={handleClickOutside} />
 
 <div class="nav-container">
-	<button class="blob-button" on:click={toggleMenu}>
-		<svg viewBox="0 0 50 50" class="blob-icon">
-			<circle cx="25" cy="25" r="23" fill="#9ed4a2" />
-			<!-- Eyes -->
-			<circle cx="18" cy="22" r="4" fill="white" />
-			<circle cx="32" cy="22" r="4" fill="white" />
-			<circle cx="18" cy="22" r="2" fill="black" />
-			<circle cx="32" cy="22" r="2" fill="black" />
-			<!-- Smile -->
-			<path
-				d="M 15 28 Q 25 38 35 28"
-				fill="none"
-				stroke="white"
-				stroke-width="3"
-				stroke-linecap="round"
-			/>
-		</svg>
-	</button>
+	<button class="blob-button" onclick={toggleMenu}> Menu </button>
 
 	{#if isMenuOpen}
 		<nav class="menu">
-			<a href="/new" class="menu-item">New</a>
-			<a href="/goal" class="menu-item">Current</a>
-			<a href="/gallery" class="menu-item">Gallery</a>
-			<a href="/options" class="menu-item">Options</a>
+			<a href="/goal" class="menu-item">Your Goals</a>
+			<button class="menu-item sign-out" onclick={handleSignOut}>Sign Out</button>
 		</nav>
 	{/if}
 </div>
@@ -48,26 +41,22 @@
 <style>
 	.nav-container {
 		position: fixed;
-		top: 20px;
-		left: 20px;
+		bottom: 20px;
+		right: 20px;
 		z-index: 1000;
 	}
 
 	.blob-button {
-		background: none;
-		border: none;
+		background: white;
+		border: 1px solid var(--background-primary);
 		cursor: pointer;
-		padding: 0;
+		padding: 0.8rem 1.2rem;
 		transition: transform 0.3s ease;
 		z-index: 1001;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	.blob-icon {
-		width: 50px;
-		height: 50px;
+		border-radius: 25px;
 	}
 
 	.blob-button:hover {
@@ -76,8 +65,8 @@
 
 	.menu {
 		position: absolute;
-		top: 60px;
-		left: 0;
+		bottom: 60px;
+		right: 0;
 		background: rgba(255, 255, 255, 0.95);
 		backdrop-filter: blur(5px);
 		padding: 1rem;
@@ -100,11 +89,24 @@
 		font-size: 1.1rem;
 		font-weight: 600;
 		text-align: center;
+		border: none;
+		background: none;
+		cursor: pointer;
 	}
 
 	.menu-item:hover {
 		background: #e8f5e9;
 		transform: scale(1.05);
+	}
+
+	.sign-out {
+		color: #ff6b6b;
+		margin-top: 0.5rem;
+		border-top: 1px solid #eee;
+	}
+
+	.sign-out:hover {
+		background: #ffe5e5;
 	}
 
 	@keyframes popIn {
@@ -135,17 +137,17 @@
 	/* Responsive design for mobile */
 	@media (max-width: 768px) {
 		.nav-container {
-			top: 15px;
-			left: 15px;
+			bottom: 15px;
+			right: 15px;
 		}
 
 		.blob-icon {
-			width: 35px; /* Smaller size for mobile */
+			width: 35px;
 			height: 35px;
 		}
 
 		.menu {
-			top: 45px; /* Adjusted to match smaller icon */
+			bottom: 45px;
 			min-width: 130px;
 		}
 
@@ -163,7 +165,7 @@
 		}
 
 		.menu {
-			top: 40px;
+			bottom: 40px;
 			min-width: 120px;
 		}
 

@@ -8,28 +8,24 @@
 
 	let goals = $derived<Goal[]>(appState.goals ?? []);
 
-	$inspect(goals);
-
 	let isModalOpen = $state(false);
 </script>
 
-<main class="page-container">
-	<div class="progress-container">
-		{#each goals as goal}
-			<div in:receive={{ key: 'goal' }} out:send={{ key: 'goal' }}>
-				<GoalCard {goal} />
-			</div>
-		{/each}
+<div class="progress-container">
+	{#each goals as goal}
+		<div in:receive={{ key: 'goal' }} out:send={{ key: 'goal' }}>
+			<GoalCard {goal} />
+		</div>
+	{/each}
 
-		{#if goals.length < 3}
-			<div class="add-button-container">
-				<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Goal</button>
-			</div>
-		{/if}
-	</div>
+	{#if goals.length < 3}
+		<div class="add-button-container">
+			<button class="add-button" onclick={() => (isModalOpen = true)}>Add New Goal</button>
+		</div>
+	{/if}
+</div>
 
-	<GoalImages {goals} />
-</main>
+<GoalImages {goals} />
 
 {#if isModalOpen}
 	<AddGoalModal close={() => (isModalOpen = false)} />
@@ -47,17 +43,6 @@
 		66% {
 			transform: translate(-20px, 20px) rotate(-5deg);
 		}
-	}
-
-	.page-container {
-		z-index: 1;
-		max-width: 800px;
-		margin: 1rem;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
 	}
 
 	.progress-container {

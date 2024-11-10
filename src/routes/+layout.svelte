@@ -14,6 +14,4 @@
 	const { children } = $props();
 </script>
 
-<BlobNav />
-
 {@render children()}

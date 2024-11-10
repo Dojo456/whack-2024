@@ -8,7 +8,7 @@
 
 <a data-sveltekit-preload-data="hover" href="/goal/{goal.id}" class="goal-card">
 	<div class="goal-card-content">
-		<img src={imageUrl} alt={goal.animal.name} width={100} height={100} />
+		<img src={imageUrl} alt={goal.animal.name} />
 		<div class="progress-card">
 			<h3>{goal.description}</h3>
 			<div class="progress-bar-container">
@@ -26,6 +26,12 @@
 		display: flex;
 		flex-direction: row;
 		gap: 1rem;
+	}
+
+	.goal-card-content img {
+		width: 100px;
+		height: 100px;
+		object-fit: cover;
 	}
 
 	.goal-card {
