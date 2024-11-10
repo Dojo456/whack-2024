@@ -48,7 +48,7 @@
 				← All Goals
 			</button>
 			<div class="header">
-				<img src={imageUrl} alt={goal.animal.name} />
+				<img src={imageUrl} alt={goal.animal.name} width={100} height={100} />
 				<h1>{goal.description}</h1>
 			</div>
 

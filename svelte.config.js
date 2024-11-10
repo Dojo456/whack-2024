@@ -1,4 +1,5 @@
 import adapter from '@sveltejs/adapter-static';
+import { enhancedImages } from '@sveltejs/enhanced-img';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -16,8 +17,9 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter({
 			fallback: 'index.html' // for SPA mode
-		})
-	}
+		}),
+	},
+	plugins: [enhancedImages()]
 };
 
 export default config;

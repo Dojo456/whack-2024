@@ -20,6 +20,8 @@
 	{#each orderedGoals as goal, index}
 		{@const imageUrl = getGoalImage(goal)}
 		<img
+			width={100}
+			height={100}
 			class="goal-image
 				{index === center ? '' : 'behind'} 
 				{focused && goal === focused ? 'focused' : ''}
@@ -36,7 +38,7 @@
 		position: fixed;
 		left: 0;
 		width: 100%;
-		bottom: 10%;
+		bottom: 12%;
 		display: flex;
 		align-items: center;
 		justify-content: center;

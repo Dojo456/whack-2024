@@ -47,10 +47,10 @@ export const appState = $state<{ currentUser: UserProfile | null; goals: Goal[] 
 	goals: []
 });
 
-import image0 from '$lib/assets/image0.jpg';
-import image1 from '$lib/assets/image1.jpg';
-import image2 from '$lib/assets/image2.jpg';
-import image3 from '$lib/assets/image3.jpg';
+import image0 from '$lib/assets/image0.png';
+import image1 from '$lib/assets/image1.png';
+import image2 from '$lib/assets/image2.png';
+import image3 from '$lib/assets/image3.png';
 
 const animals: { [id: string]: Animal } = {
 	'1': {
@@ -175,8 +175,7 @@ export const registerListeners = () => {
 
 	unsubscribe = auth.onAuthStateChanged(async (user) => {
 		if (user) {
-			await syncUserProfile(user);
-			await syncUserGoals();
+			await Promise.all([syncUserProfile(user), syncUserGoals()]);
 
 			unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
 				const data = snapshot.data();

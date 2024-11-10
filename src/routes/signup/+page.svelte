@@ -1,28 +1,29 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { auth } from '$lib/firebase.svelte';
 	import type { FirebaseError } from 'firebase/app';
-	import { signInWithEmailAndPassword } from 'firebase/auth';
+	import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 	let email = $state('');
 	let password = $state('');
+	let confirmPassword = $state('');
 
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
-	$inspect(error);
-
-	const from = $page.url.searchParams.get('from') ?? '/goal';
-
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 
+		if (password !== confirmPassword) {
+			error = 'Passwords do not match';
+			return;
+		}
+
 		try {
 			loading = true;
-			await signInWithEmailAndPassword(auth, email, password);
+			await createUserWithEmailAndPassword(auth, email, password);
 
-			goto(from);
+			goto('/goal');
 		} catch (reason) {
 			error = (reason as FirebaseError).message;
 		} finally {
@@ -32,8 +33,8 @@
 </script>
 
 <main>
-	<div class="login-container">
-		<h1>Login</h1>
+	<div class="signup-container">
+		<h1>Create Account</h1>
 		<form onsubmit={handleSubmit}>
 			<div class="form-group">
 				<label for="email">Email</label>
@@ -45,14 +46,21 @@
 				<input type="password" id="password" bind:value={password} required />
 			</div>
 
+			<div class="form-group">
+				<label for="confirmPassword">Confirm Password</label>
+				<input type="password" id="confirmPassword" bind:value={confirmPassword} required />
+			</div>
+
 			<button type="submit" disabled={loading}>
-				{loading ? 'Loading...' : 'Log In'}
+				{loading ? 'Creating Account...' : 'Sign Up'}
 			</button>
 
-			<p class="error">{error}</p>
+			{#if error}
+				<p class="error">{error}</p>
+			{/if}
 
-			<p class="signup-link">
-				Need an account? <a href="/signup">Sign up</a>
+			<p class="login-link">
+				Already have an account? <a href="/login">Log in</a>
 			</p>
 		</form>
 	</div>
@@ -65,7 +73,7 @@
 		padding: 2rem;
 	}
 
-	.login-container {
+	.signup-container {
 		background: var(--background-card);
 		max-width: 400px;
 		margin: 0 auto;
@@ -90,6 +98,8 @@
 	.error {
 		color: red;
 		font-weight: 600;
+		text-align: center;
+		margin: 1rem 0;
 	}
 
 	label {
@@ -133,19 +143,19 @@
 		box-shadow: var(--shadow-hover);
 	}
 
-	.signup-link {
+	.login-link {
 		text-align: center;
 		margin-top: 1rem;
 		color: var(--text-secondary);
 	}
 
-	.signup-link a {
+	.login-link a {
 		color: var(--matcha-green);
 		text-decoration: none;
 		font-weight: 600;
 	}
 
-	.signup-link a:hover {
+	.login-link a:hover {
 		text-decoration: underline;
 	}
 
