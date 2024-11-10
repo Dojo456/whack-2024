@@ -11,7 +11,7 @@ export function getGoalImage(goal: Goal) {
 	let imageUrl: string | null = null;
 
 	stages.forEach(([progressPercent, stage]) => {
-		if (progress <= Number(progressPercent) && !imageUrl) {
+		if (progress >= Number(progressPercent)) {
 			imageUrl = stage.imageUrl;
 		}
 	});

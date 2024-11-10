@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import { send, receive } from '$lib/transition.svelte';
 	import { getGoalImage } from '$lib/utils';
+	import GoalImages from '$lib/components/GoalImages.svelte';
 
 	onMount(() => {
 		window.addEventListener('keydown', (event) => {
@@ -16,7 +17,8 @@
 	});
 
 	const goalId = $page.params.id;
-	const goal = $derived<Goal | undefined | null>(appState.goals.find((g) => g.id === goalId));
+	const goals = $derived<Goal[]>(appState.goals);
+	const goal = $derived<Goal | undefined>(goals.find((g) => g.id === goalId));
 
 	const imageUrl = $derived<string | undefined>(goal ? getGoalImage(goal) : undefined);
 </script>
@@ -66,6 +68,8 @@
 				</div>
 			</div>
 		</div>
+
+		<GoalImages {goals} focused={goal} />
 	{:else if goal === null}
 		<div class="error-message">Goal not found</div>
 	{:else}
@@ -86,7 +90,6 @@
 	}
 
 	.page-container {
-		flex-grow: 1;
 		z-index: 1;
 		max-width: 800px;
 		margin: 1rem;
@@ -200,27 +203,6 @@
 		}
 		66% {
 			transform: translate(-20px, 20px) rotate(-5deg);
-		}
-	}
-
-	@media (max-width: 600px) {
-		.header {
-			flex-direction: column;
-			text-align: center;
-			gap: 1rem;
-		}
-
-		.header img {
-			width: 120px;
-			height: 120px;
-		}
-
-		h1 {
-			font-size: 1.5rem;
-		}
-
-		.goal-detail-card {
-			padding: 1.5rem;
 		}
 	}
 

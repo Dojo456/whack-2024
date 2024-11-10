@@ -57,15 +57,15 @@ const animals: { [id: string]: Animal } = {
 		name: 'Tree',
 		id: '1',
 		stages: {
-			0.25: {
+			0: {
 				imageUrl: image0,
 				description: 'Blob'
 			},
-			0.5: {
+			0.33: {
 				imageUrl: image1,
 				description: 'Blob'
 			},
-			0.75: {
+			0.66: {
 				imageUrl: image2,
 				description: 'Blob'
 			},

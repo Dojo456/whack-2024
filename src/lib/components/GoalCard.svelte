@@ -12,7 +12,7 @@
 		<div class="progress-card">
 			<h3>{goal.description}</h3>
 			<div class="progress-bar-container">
-				<div class="progress-bar" style="width: {goal.progress}%"></div>
+				<div class="progress-bar" style="width: {(goal.progress / goal.amount) * 100}%"></div>
 			</div>
 			<span class="progress-text">
 				${goal.progress} out of ${goal.amount}

@@ -4,6 +4,7 @@
 	import { appState } from '$lib/firebase.svelte';
 	import type { Goal } from '$lib/models';
 	import { send, receive } from '$lib/transition.svelte';
+	import GoalImages from '$lib/components/GoalImages.svelte';
 
 	let goals = $derived<Goal[]>(appState.goals ?? []);
 
@@ -26,6 +27,8 @@
 			</div>
 		{/if}
 	</div>
+
+	<GoalImages {goals} />
 </main>
 
 {#if isModalOpen}
@@ -47,20 +50,20 @@
 	}
 
 	.page-container {
-		position: relative;
 		z-index: 1;
-		width: 100%;
 		max-width: 800px;
-		margin: 0 auto;
-		padding: 2rem 1rem;
+		margin: 1rem;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 	}
 
 	.progress-container {
 		display: flex;
 		flex-direction: column;
 		gap: 2rem;
-		padding: 1.5rem;
-		margin: 0 auto;
 		width: 100%;
 		max-width: 600px;
 	}
@@ -68,17 +71,6 @@
 	.add-button-container {
 		display: flex;
 		justify-content: center;
-	}
-
-	@media (max-width: 600px) {
-		.page-container {
-			margin: 1rem auto;
-		}
-
-		.progress-container {
-			padding: 1rem;
-			gap: 1.5rem;
-		}
 	}
 
 	.add-button {
