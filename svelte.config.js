@@ -1,6 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -19,7 +20,7 @@ const config = {
 			fallback: 'index.html' // for SPA mode
 		}),
 	},
-	plugins: [enhancedImages()]
+	plugins: [enhancedImages(), SvelteKitPWA()]
 };
 
 export default config;

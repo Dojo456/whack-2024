@@ -27,6 +27,7 @@
 		max-width: 800px;
 		margin: 1rem;
 		position: fixed;
+		overflow-y: hidden;
 		top: 0;
 		left: 0;
 		right: 0;
@@ -38,8 +39,9 @@
 		background-image: url('$lib/assets/Floating_island_.jpg');
 		background-size: 400%;
 		background-position: 50% 0%;
-		min-height: 100vh;
-		position: relative;
+		height: 100vh;
+		width: 100vw;
+		position: fixed;
 		overflow: hidden;
 		overflow-y: hidden;
 	}
