@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import BlobNav from '$lib/components/BlobNav.svelte';
 	import { appState, auth } from '$lib/firebase.svelte';
+	import background from '$lib/assets/Floating_island_.jpg';
 
 	const { children } = $props();
 
@@ -15,16 +16,16 @@
 </script>
 
 <BlobNav />
-<div class="background">
-	<main class="page-container">
-		{@render children()}
-	</main>
+<div class="background-container">
+	<img class="background" src={background} alt="background" />
 </div>
+<main class="page-container">
+	{@render children()}
+</main>
 
 <style>
 	.page-container {
 		z-index: 1;
-		max-width: 800px;
 		margin: 1rem;
 		position: fixed;
 		overflow-y: hidden;
@@ -34,15 +35,17 @@
 		bottom: 0;
 	}
 
-	.background {
-		background-color: #d5dde0;
-		background-image: url('$lib/assets/Floating_island_.jpg');
-		background-size: 400%;
-		background-position: 50% 0%;
+	.background-container {
+		position: fixed;
+		bottom: 0;
 		height: 100vh;
 		width: 100vw;
-		position: fixed;
-		overflow: hidden;
-		overflow-y: hidden;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.background {
+		height: 100%;
 	}
 </style>

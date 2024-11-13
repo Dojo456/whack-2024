@@ -179,13 +179,13 @@ export const addGoal = async (goal: GoalDocument): Promise<void> => {
 };
 
 export const registerListeners = () => {
-	let unsubscribe: () => void;
+	let userUnsubscribe: (() => void) | undefined;
 
-	unsubscribe = auth.onAuthStateChanged(async (user) => {
+	const authUnsubscribe = auth.onAuthStateChanged(async (user) => {
 		if (user) {
 			await Promise.all([syncUserProfile(user), syncUserGoals()]);
 
-			unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+			userUnsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
 				const data = snapshot.data();
 				if (!data) {
 					return;
@@ -198,9 +198,12 @@ export const registerListeners = () => {
 			});
 		} else {
 			appState.currentUser = null;
-			unsubscribe?.();
+			userUnsubscribe?.();
 		}
 	});
 
-	return unsubscribe;
+	return () => {
+		authUnsubscribe();
+		userUnsubscribe?.();
+	};
 };

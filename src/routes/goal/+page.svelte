@@ -1,6 +1,6 @@
 <script lang="ts">
 	import GoalCard from '$lib/components/GoalCard.svelte';
-	import AddGoalModal from '$lib/components/AddGoalModal.svelte';
+	import AddGoalModal from './AddGoalModal.svelte';
 	import { appState } from '$lib/firebase.svelte';
 	import type { Goal } from '$lib/models';
 	import { send, receive } from '$lib/transition.svelte';
@@ -56,7 +56,6 @@
 		flex-direction: column;
 		gap: 2rem;
 		width: 100%;
-		max-width: 600px;
 	}
 
 	.add-button-container {

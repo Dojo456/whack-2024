@@ -72,7 +72,6 @@
 		padding: 2rem;
 		border-radius: var(--radius-medium);
 		box-shadow: var(--shadow-soft);
-		animation: float 6s ease-in-out infinite;
 	}
 
 	h1 {
@@ -147,17 +146,5 @@
 
 	.signup-link a:hover {
 		text-decoration: underline;
-	}
-
-	@keyframes float {
-		0% {
-			transform: translateY(0px);
-		}
-		50% {
-			transform: translateY(-5px);
-		}
-		100% {
-			transform: translateY(0px);
-		}
 	}
 </style>

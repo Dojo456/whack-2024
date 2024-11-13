@@ -6,17 +6,6 @@
 	const { goals, focused }: { goals: Goal[]; focused?: string } = $props();
 
 	const orderedGoals = $derived<Goal[]>(appState.goals ?? []);
-
-	const center = goals.length % 2 === 0 ? goals.length / 2 : (goals.length - 1) / 2;
-
-	$effect(() => {
-		if (focused) {
-			const temp = orderedGoals[center];
-			const focusedIndex = orderedGoals.findIndex((g) => g.id === focused);
-			orderedGoals[center] = goals[focusedIndex];
-			orderedGoals[focusedIndex] = temp;
-		}
-	});
 </script>
 
 <div class="goal-image-container">
@@ -24,7 +13,6 @@
 		{@const imageUrl = getGoalImage(goal)}
 		<img
 			class="goal-image
-				{index === center ? '' : 'behind'} 
 				{focused && goal.id === focused ? 'focused' : ''}
 				{focused && goal.id !== focused ? 'unfocused' : ''}
 			"
@@ -39,7 +27,7 @@
 		position: fixed;
 		left: 0;
 		width: 100%;
-		bottom: 12%;
+		bottom: 10%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -67,9 +55,5 @@
 		transform: scale(0.8);
 		transform-origin: bottom;
 		filter: brightness(0.5);
-	}
-
-	.behind {
-		z-index: -1;
 	}
 </style>

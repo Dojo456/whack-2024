@@ -76,7 +76,13 @@
 		</button>
 		<div class="header">
 			<img src={imageUrl} alt={goal.animal.name} />
-			<h1>{goal.description}</h1>
+			<div class="header-content">
+				<h1>{goal.description}</h1>
+				<div>
+					<h3>Deadline</h3>
+					<p>{new Date(goal.deadline).toLocaleDateString()}</p>
+				</div>
+			</div>
 		</div>
 
 		<div class="progress-section">
@@ -94,13 +100,6 @@
 				<button class="deposit-btn custom" onclick={() => handleCustomDeposit()}
 					>Custom Amount</button
 				>
-			</div>
-		</div>
-
-		<div class="details-section">
-			<div class="detail-item">
-				<h3>Deadline</h3>
-				<p>{new Date(goal.deadline).toLocaleDateString()}</p>
 			</div>
 		</div>
 	</div>
@@ -138,8 +137,8 @@
 		display: flex;
 		align-items: center;
 		margin-top: 1.5rem;
-		gap: 2rem;
 		margin-bottom: 2rem;
+		height: 150px;
 	}
 
 	.header img {
@@ -150,15 +149,25 @@
 		background: lightgray;
 	}
 
+	.header-content {
+		margin-left: 2rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	.header-content * {
+		margin: 0;
+	}
+
 	h1 {
 		color: var(--text-primary);
 		font-size: 2rem;
-		margin: 0;
 		font-weight: 800;
-	}
-
-	.progress-section {
-		margin: 2rem 0;
+		line-height: 1.2;
 	}
 
 	.progress-bar-container {
@@ -180,34 +189,6 @@
 	.progress-text {
 		color: var(--text-primary);
 		font-size: 1.2rem;
-		font-weight: 600;
-	}
-
-	.details-section {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 2rem;
-		margin-top: 2rem;
-	}
-
-	.detail-item {
-		background: rgba(255, 255, 255, 0.9);
-		padding: 1.5rem;
-		padding-bottom: 0;
-		border-radius: var(--radius-small);
-		backdrop-filter: blur(5px);
-	}
-
-	.detail-item h3 {
-		color: #7fb883;
-		margin: 0 0 0.5rem 0;
-		font-size: 1.2rem;
-	}
-
-	.detail-item p {
-		color: var(--text-primary);
-		font-size: 1.1rem;
-		margin: 0;
 		font-weight: 600;
 	}
 
